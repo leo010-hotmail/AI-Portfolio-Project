@@ -2,10 +2,12 @@ from openai import OpenAI
 from llm.base import LLMClient
 import os
 import json
+import streamlit as st
 
 class OpenAILLM(LLMClient):
     def __init__(self):
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    #    self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 
     def classify_intent(self, user_input: str) -> dict:
         system_prompt = """
