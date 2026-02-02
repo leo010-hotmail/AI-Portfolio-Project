@@ -24,7 +24,32 @@ def handle_user_input(user_input: str):
         parsed = llm.parse(user_input)
         return handle_trade_flow(parsed, user_input)
 
-    return "Sorry, I didn’t understand your request."
+    if intent == "portfolio_insight":
+        return (
+            "📊 I’m still building the portfolio insights module.\n\n"
+            "Soon you’ll be able to see holdings, performance, and analytics here.\n\n"
+            "For now, I can help you **place a trade** if you’d like."
+        )
+
+    if intent == "transfer":
+        return (
+            "💸 Transfers aren’t supported yet, but they’re on the roadmap.\n\n"
+            "I can currently help you **buy or sell stocks** if that’s useful."
+        )
+
+    if intent == "kyc":
+        return (
+            "📝 Profile and KYC updates aren’t available yet.\n\n"
+            "Right now, I’m focused on helping you **place trades quickly and accurately**."
+        )
+
+    # fallback
+    return (
+        "I’m not sure I can help with that yet.\n\n"
+        "You can try something like:\n"
+        "- *Buy 10 shares of AAPL*\n"
+        "- *Sell 5 TSLA at market price*"
+    )
 
 
 

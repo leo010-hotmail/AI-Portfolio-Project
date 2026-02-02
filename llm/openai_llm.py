@@ -4,11 +4,13 @@ import os
 import json
 import streamlit as st
 
-class OpenAILLM(LLMClient):
+class OpenAILLM:
     def __init__(self):
-    #    self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
-        self.client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise RuntimeError("OPENAI_API_KEY not set")
+
+        self.client = OpenAI(api_key=api_key)
 
     def classify_intent(self, user_input: str) -> dict:
         system_prompt = """
