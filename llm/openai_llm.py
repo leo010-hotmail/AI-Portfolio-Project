@@ -51,37 +51,7 @@ Return JSON ONLY in this format:
             return json.loads(content)
         except json.JSONDecodeError:
             return {"intent": "unknown", "confidence": 0.0}
-        
-    def extract_trade_parameters(self, user_input: str) -> dict:
-        system_prompt = """
-    You extract structured trade instructions for a trading platform.
 
-    Return JSON ONLY in this format:
-    {
-    "symbol": string | null,
-    "quantity": number | null,
-    "price": number | null,
-    "action": "buy" | "sell" | null,
-    "order_type": "market" | "limit" | null,
-    "account": "cash" | "tfsa" | "rrsp" | null
-    }
-    """
-
-        response = self.client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_input}
-            ],
-            temperature=0
-        )
-
-        content = response.choices[0].message.content
-
-        try:
-            return json.loads(content)
-        except:
-            return {"missing_fields": ["unknown_error"]}
 
     def parse(self, user_input: str) -> dict:
             
