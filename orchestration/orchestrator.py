@@ -37,12 +37,23 @@ def handle_user_input(user_input: str):
             "I can currently help you **buy or sell stocks** if that’s useful."
         )
 
+    if intent == "market_research":
+        return (
+            "📝 Market research is not available yet.\n\n"
+            "Right now, I’m focused on helping you **place trades quickly and accurately**."
+        )
+    
     if intent == "kyc":
         return (
             "📝 Profile and KYC updates aren’t available yet.\n\n"
             "Right now, I’m focused on helping you **place trades quickly and accurately**."
         )
-
+    
+    if intent == "help_faq":
+        return (
+            "📝 I can't help with common questions about using the platform at this stage.\n\n"
+            "Right now, I’m focused on helping you **place trades quickly and accurately**."
+        )
     # fallback
     return (
         "I’m not sure I can help with that yet.\n\n"

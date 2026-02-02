@@ -21,7 +21,13 @@ Possible intents:
 - place_trade
 - transfer
 - kyc
+- help_faq
+- market_research
 - unknown
+
+market_research: user is asking for investment ideas, comparisons,
+market trends, or research-oriented information.
+help_faq: user is asking how to do something in the app or where to find information.
 
 Return JSON ONLY in this format:
 {
