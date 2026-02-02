@@ -99,4 +99,4 @@ Add historical portfolio insights and analytics.
 
 License
 
-MIT License © 2026 Leo L
+MIT License © 2026 Aman Akbar
