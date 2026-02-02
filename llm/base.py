@@ -7,7 +7,7 @@ class LLMClient(ABC):
         pass
 
     @abstractmethod
-    def extract_trade_parameters(self, user_input: str) -> dict:
+    def parse(self, user_input: str) -> dict:
         """
         Returns structured trade parameters.
         """
