@@ -1,7 +1,7 @@
 import streamlit as st
 from orchestration.orchestrator import handle_user_input
 from services.broker_app import list_accounts, get_account,load_account_snapshot
-from services.trading_app import get_account_snapshot
+#from services.trading_app import get_account_snapshot
 
 st.title("AI Investment Assistant - v1.0a")
 

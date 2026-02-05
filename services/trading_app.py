@@ -1,4 +1,5 @@
 # services/trading_app.py
+"""
 import os
 from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import GetOrdersRequest
@@ -30,3 +31,4 @@ def get_account_snapshot(account_id: str) -> dict:
         "positions": positions,
         "open_orders": orders
     }
+"""
