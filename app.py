@@ -35,25 +35,32 @@ if "messages" not in st.session_state:
 if "trade_state" not in st.session_state:
     st.session_state.trade_state = {}
 
-# --------- Show Account Snapshot -----------
-if "account_snapshot_loaded" not in st.session_state:
-    snapshot = load_account_snapshot()
 
-    summary = f"""
-### 📊 Account Snapshot
-**Account:** {snapshot['account_number']}  
-**Equity:** ${snapshot['last_equity']}  
-**Account Type:** {snapshot['account_type']}
-"""
+# ---------- Account Snapshot (load once per session) ----------
+if "account_snapshot" not in st.session_state:
+    try:
+        st.session_state.account_snapshot = load_account_snapshot()
+    except Exception as e:
+        st.session_state.account_snapshot = None
+        st.sidebar.error("Failed to load account snapshot")
 
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": summary
-    })
+with st.sidebar:
+    st.header("📊 Account Snapshot")
 
-    st.session_state.account_snapshot_loaded = True
+    snapshot = st.session_state.get("account_snapshot")
+
+    if snapshot:
+        st.markdown("**Account**")
+        st.write(snapshot["account_number"])
+
+        st.markdown("**Account Type**")
+        st.write(snapshot["account_type"])
+
+        st.metric("Equity", f"${snapshot['last_equity']}")
 
 
+    else:
+        st.info("Account data not available")        
 # ---------- Render Chat History ----------
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
