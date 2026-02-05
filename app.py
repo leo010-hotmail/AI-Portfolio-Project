@@ -3,6 +3,29 @@ from orchestration.orchestrator import handle_user_input
 from services.broker_app import list_accounts, get_account,load_account_snapshot
 #from services.trading_app import get_account_snapshot
 
+import time
+
+MAX_REQUESTS = 20
+WINDOW_SECONDS = 60
+
+if "request_times" not in st.session_state:
+    st.session_state.request_times = []
+
+now = time.time()
+
+# keep only recent requests
+st.session_state.request_times = [
+    t for t in st.session_state.request_times
+    if now - t < WINDOW_SECONDS
+]
+
+if len(st.session_state.request_times) >= MAX_REQUESTS:
+    st.warning("⚠️ Too many requests. Please wait a minute.")
+    st.stop()
+
+st.session_state.request_times.append(now)
+
+
 st.title("AI Investment Assistant - v1.0a")
 
 # ---------- Session State ----------
