@@ -1,5 +1,7 @@
 import streamlit as st
 from orchestration.orchestrator import handle_user_input
+from services.broker_app import list_accounts, get_account,load_account_snapshot
+from services.trading_app import get_account_snapshot
 
 st.title("AI Investment Assistant")
 
@@ -10,13 +12,34 @@ if "messages" not in st.session_state:
 if "trade_state" not in st.session_state:
     st.session_state.trade_state = {}
 
+# --------- Show Account Snapshot -----------
+if "account_snapshot_loaded" not in st.session_state:
+    snapshot = load_account_snapshot()
+
+    summary = f"""
+### 📊 Account Snapshot
+**Account:** {snapshot['account_number']}  
+**Equity:** ${snapshot['last_equity']}  
+**Account Type:** {snapshot['account_type']}
+"""
+
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": summary
+    })
+
+    st.session_state.account_snapshot_loaded = True
+
+
 # ---------- Render Chat History ----------
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
+
 # ---------- Chat Input ----------
 user_input = st.chat_input("What would you like to do today?")
+
 
 if user_input:
     # 1️⃣ Save user message
