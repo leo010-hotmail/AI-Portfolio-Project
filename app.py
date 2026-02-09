@@ -2,6 +2,7 @@ import streamlit as st
 from orchestration.orchestrator import handle_user_input
 from services.broker_app import list_accounts, get_account,load_account_snapshot
 #from services.trading_app import get_account_snapshot
+from services.logger import log_message
 
 import time
 
@@ -66,9 +67,9 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-
 # ---------- Chat Input ----------
 user_input = st.chat_input("What would you like to do today?")
+
 
 
 if user_input:
@@ -77,6 +78,9 @@ if user_input:
         "role": "user",
         "content": user_input
     })
+    
+    # ✅ Log user message immediately
+    log_message("user", user_input, session_id=st.session_state.get("session_id", "session1"))
 
     # 2️⃣ Get assistant response
     response = handle_user_input(user_input)
@@ -88,5 +92,20 @@ if user_input:
             "content": response
         })
 
+    # ✅ Log assistant response immediately
+    log_message("assistant", response, session_id=st.session_state.get("session_id", "session1"))
+
     # 4️⃣ Force rerender
     st.rerun()
+
+# ---------- Footer ----------
+with st.sidebar:
+    st.markdown("<hr>", unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div style="text-align:center; font-size:12px; color:gray;">
+        Powered by <b>OpenAI</b> and <b>Alpaca</b>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
