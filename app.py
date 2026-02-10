@@ -104,7 +104,9 @@ with st.sidebar:
     st.markdown(
         """
         <div style="text-align:center; font-size:12px; color:gray;">
-        Powered by <b>OpenAI</b> and <b>Alpaca</b>
+        Built by Aman A.<br>
+        Powered by <b>OpenAI</b> and <b>Alpaca</b>.<br>
+        Interactions may be logged for product improvement.
         </div>
         """,
         unsafe_allow_html=True
