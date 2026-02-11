@@ -1,8 +1,8 @@
 import streamlit as st
 from orchestration.orchestrator import handle_user_input
-from services.broker_app import list_accounts, get_account,load_account_snapshot
-#from services.trading_app import get_account_snapshot
+from services.broker_app import list_accounts, get_account,load_account_snapshot, list_orders
 from services.logger import log_message
+
 
 import time
 
@@ -54,14 +54,37 @@ with st.sidebar:
         st.markdown("**Account**")
         st.write(snapshot["account_number"])
 
-        st.markdown("**Account Type**")
-        st.write(snapshot["account_type"])
+    #    st.markdown("**Account Type**")
+    #    st.write(snapshot["account_type"])
 
-        st.metric("**Equity**", f"${snapshot['last_equity']}")
+        st.metric("**Buying Power**", f"${snapshot['last_equity']}")
 
 
     else:
-        st.info("Account data not available")        
+        st.info("Account data not available")    
+
+# ---------- Recent Order (load once per session) ----------
+# Get account ID
+accounts = list_accounts()
+account_id = accounts[0]["id"]
+
+# Fetch 5 most recent orders
+orders = list_orders(account_id, limit=5)
+
+st.sidebar.markdown("### 🧾 Recent Orders")
+
+if not orders:
+    st.sidebar.write("No recent orders.")
+else:
+    for order in orders:
+        symbol = order.get("symbol")
+        qty = order.get("qty")
+        status = order.get("status")
+
+        st.sidebar.write(
+            f"**{symbol}** — {qty} shares\nStatus: `{status}`"
+        )
+    
 # ---------- Render Chat History ----------
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
@@ -111,3 +134,4 @@ with st.sidebar:
         """,
         unsafe_allow_html=True
     )
+

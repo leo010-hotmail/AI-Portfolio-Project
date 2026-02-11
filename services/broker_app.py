@@ -54,3 +54,16 @@ def place_order(account_id, symbol, quantity, side, order_type="market", price=N
     response.raise_for_status()
 
     return response.json()
+
+def list_orders(account_id, limit=5):
+    url = f"{BASE_URL}/trading/accounts/{account_id}/orders"
+
+    params = {
+        "status": "all",      # open, closed, all
+        "direction": "desc",  # newest first
+        "limit": limit
+    }
+
+    response = requests.get(url, headers=HEADERS, params=params)
+    response.raise_for_status()
+    return response.json()
