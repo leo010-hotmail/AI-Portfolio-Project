@@ -57,7 +57,7 @@ with st.sidebar:
         st.markdown("**Account Type**")
         st.write(snapshot["account_type"])
 
-        st.metric("Equity", f"${snapshot['last_equity']}")
+        st.metric("**Equity**", f"${snapshot['last_equity']}")
 
 
     else:
@@ -104,7 +104,7 @@ with st.sidebar:
     st.markdown(
         """
         <div style="text-align:center; font-size:12px; color:gray;">
-        Built by Aman A.<br>
+        Built by <b>Aman A.</b><br>
         Powered by <b>OpenAI</b> and <b>Alpaca</b>.<br>
         Interactions may be logged for product improvement.
         </div>

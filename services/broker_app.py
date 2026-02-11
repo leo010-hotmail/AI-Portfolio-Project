@@ -2,6 +2,9 @@
 import os
 import requests
 from dotenv import load_dotenv
+from alpaca.broker.client import BrokerClient
+from alpaca.broker.requests import MarketOrderRequest, LimitOrderRequest
+from alpaca.trading.enums import OrderSide, TimeInForce
 
 load_dotenv()
 
@@ -32,3 +35,22 @@ def load_account_snapshot():
     accounts = list_accounts()
     account_id = accounts[0]["id"]
     return get_account(account_id)
+
+def place_order(account_id, symbol, quantity, side, order_type="market", price=None):
+    url = f"{BASE_URL}/trading/accounts/{account_id}/orders"
+
+    order_data = {
+        "symbol": symbol,
+        "qty": quantity,
+        "side": side.lower(),  # "buy" or "sell"
+        "type": order_type.lower(),  # "market" or "limit"
+        "time_in_force": "day"
+    }
+
+    if order_type.lower() == "limit" and price:
+        order_data["limit_price"] = str(price)
+
+    response = requests.post(url, json=order_data, headers=HEADERS)
+    response.raise_for_status()
+
+    return response.json()
