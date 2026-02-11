@@ -67,3 +67,10 @@ def list_orders(account_id, limit=5):
     response = requests.get(url, headers=HEADERS, params=params)
     response.raise_for_status()
     return response.json()
+
+def list_positions(account_id):
+    url = f"{BASE_URL}/trading/accounts/{account_id}/positions"
+    response = requests.get(url, headers=HEADERS)
+    response.raise_for_status()
+    return response.json()
+

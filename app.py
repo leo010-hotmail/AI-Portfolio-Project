@@ -1,6 +1,6 @@
 import streamlit as st
 from orchestration.orchestrator import handle_user_input
-from services.broker_app import list_accounts, get_account,load_account_snapshot, list_orders
+from services.broker_app import list_accounts, get_account,load_account_snapshot, list_orders, list_positions
 from services.logger import log_message
 
 
@@ -56,14 +56,15 @@ with st.sidebar:
 
     #    st.markdown("**Account Type**")
     #    st.write(snapshot["account_type"])
-
-        st.metric("**Buying Power**", f"${snapshot['last_equity']}")
+        st.markdown("**Buying Power**")
+        st.write(f"${snapshot['last_equity']}")
+    #    st.metric("**Buying Power**", f"${snapshot['last_equity']}")
 
 
     else:
         st.info("Account data not available")    
 
-# ---------- Recent Order (load once per session) ----------
+# ---------- Recent Order  ----------
 # Get account ID
 accounts = list_accounts()
 account_id = accounts[0]["id"]
@@ -84,7 +85,40 @@ else:
         st.sidebar.write(
             f"**{symbol}** — {qty} shares\nStatus: `{status}`"
         )
-    
+
+# ---------- Top holdings  ----------
+def render_top_holdings():
+    accounts = list_accounts()
+    account_id = accounts[0]["id"]
+
+    positions = list_positions(account_id)
+
+    if not positions:
+        st.sidebar.markdown("### 📊 Top Holdings")
+        st.sidebar.write("No positions yet.")
+        return
+
+    # Sort by market value (descending)
+    sorted_positions = sorted(
+        positions,
+        key=lambda x: float(x.get("market_value", 0)),
+        reverse=True
+    )
+
+    top_5 = sorted_positions[:5]
+
+    st.sidebar.markdown("### 📊 Top Holdings")
+
+    for pos in top_5:
+        symbol = pos["symbol"]
+        qty = pos["qty"]
+        market_value = float(pos["market_value"])
+
+        st.sidebar.write(
+            f"**{symbol}** — {qty} shares  \n"
+            f"Market value: ${market_value:,.2f}"
+        )
+render_top_holdings()
 # ---------- Render Chat History ----------
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
