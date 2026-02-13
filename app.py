@@ -57,11 +57,15 @@ with st.sidebar:
 
     if snapshot:
         trading_account = st.session_state.get("trading_account")
+
         st.markdown("**Account**")
         st.write(snapshot["account_number"])
 
         st.markdown("**Equity**")
-        st.write(f"${snapshot['last_equity']}")
+        last_equity = float(snapshot.get("last_equity", 0))
+        st.write(f"${last_equity:,.2f}")
+
+        #st.write(f"${snapshot['last_equity']}")
 
         if trading_account:
             buying_power = float(trading_account.get("buying_power", 0))
