@@ -1,6 +1,6 @@
 import streamlit as st
 from orchestration.orchestrator import handle_user_input
-from services.broker_app import list_accounts, get_account,load_account_snapshot, list_orders, list_positions
+from services.broker_app import get_trading_account_details, list_accounts, get_account, list_orders, list_positions
 from services.logger import log_message
 
 
@@ -40,7 +40,12 @@ if "trade_state" not in st.session_state:
 # ---------- Account Snapshot (load once per session) ----------
 if "account_snapshot" not in st.session_state:
     try:
-        st.session_state.account_snapshot = load_account_snapshot()
+        accounts = list_accounts()
+        account_id = accounts[0]["id"]
+    
+        st.session_state.account_snapshot = get_account(account_id)
+        st.session_state.trading_account = get_trading_account_details(account_id)
+
     except Exception as e:
         st.session_state.account_snapshot = None
         st.sidebar.error("Failed to load account snapshot")
@@ -51,15 +56,18 @@ with st.sidebar:
     snapshot = st.session_state.get("account_snapshot")
 
     if snapshot:
+        trading_account = st.session_state.get("trading_account")
         st.markdown("**Account**")
         st.write(snapshot["account_number"])
 
-    #    st.markdown("**Account Type**")
-    #    st.write(snapshot["account_type"])
-        st.markdown("**Buying Power**")
+        st.markdown("**Equity**")
         st.write(f"${snapshot['last_equity']}")
-    #    st.metric("**Buying Power**", f"${snapshot['last_equity']}")
 
+        if trading_account:
+            buying_power = float(trading_account.get("buying_power", 0))
+
+            st.markdown("**Buying Power**")
+            st.write(f"${buying_power:,.2f}")
 
     else:
         st.info("Account data not available")    

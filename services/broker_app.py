@@ -31,10 +31,10 @@ def get_account(account_id):
     response.raise_for_status()
     return response.json()
 
-def load_account_snapshot():
-    accounts = list_accounts()
-    account_id = accounts[0]["id"]
-    return get_account(account_id)
+#def load_account_snapshot():
+#    accounts = list_accounts()
+#    account_id = accounts[0]["id"]
+#    return get_account(account_id)
 
 def place_order(account_id, symbol, quantity, side, order_type="market", price=None):
     url = f"{BASE_URL}/trading/accounts/{account_id}/orders"
@@ -74,3 +74,8 @@ def list_positions(account_id):
     response.raise_for_status()
     return response.json()
 
+def get_trading_account_details(account_id):
+    url = f"{BASE_URL}/trading/accounts/{account_id}/account"
+    response = requests.get(url, headers=HEADERS)
+    response.raise_for_status()
+    return response.json()
