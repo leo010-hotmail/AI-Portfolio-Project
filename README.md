@@ -24,6 +24,8 @@ Frontend / UI: Streamlit
 
 AI/NLP: OpenAI GPT-4 API
 
+Alpaca Broker API
+
 Backend Logic: Python, modular structure (orchestration, services, llm)
 
 Version Control: Git & GitHub
@@ -34,6 +36,8 @@ Prerequisites
 Python 3.10+
 
 OpenAI API key
+
+Alpaca Broker API Key
 
 Streamlit
 
