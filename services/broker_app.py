@@ -55,11 +55,11 @@ def place_order(account_id, symbol, quantity, side, order_type="market", price=N
 
     return response.json()
 
-def list_orders(account_id, limit=5):
+def list_orders(account_id, limit=5, status="all"):
     url = f"{BASE_URL}/trading/accounts/{account_id}/orders"
 
     params = {
-        "status": "all",      # open, closed, all
+        "status": status,      # open, closed, all
         "direction": "desc",  # newest first
         "limit": limit
     }
@@ -78,4 +78,18 @@ def get_trading_account_details(account_id):
     url = f"{BASE_URL}/trading/accounts/{account_id}/account"
     response = requests.get(url, headers=HEADERS)
     response.raise_for_status()
+    return response.json()
+
+def cancel_order(account_id, order_id):
+    url = f"{BASE_URL}/trading/accounts/{account_id}/orders/{order_id}"
+    response = requests.delete(url, headers=HEADERS)
+    response.raise_for_status()
+    # Alpaca returns 204 No Content on successful cancel
+    if response.status_code == 204:
+        return {
+            "id": order_id,
+            "status": "cancelled"
+        }
+
+    # Fallback if response body exists
     return response.json()

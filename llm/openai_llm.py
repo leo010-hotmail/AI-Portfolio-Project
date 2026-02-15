@@ -19,12 +19,21 @@ You are an intent classifier for a trading platform assistant.
 Possible intents:
 - portfolio_insight
 - place_trade
+- cancel_order
+- view_orders
+- view_portfolio
 - transfer
 - kyc
 - help_faq
+- market_data
 - market_research
 - unknown
 
+cancel_order: user wants to cancel an existing open order.
+view_orders: user wants to view the details of all open orders.
+view_portfolio: user wants to view the details of all the stocks in their account. 
+market_data: user is asking for information about a particular stock such as its current price,
+day high, day low, historical price, trading volume, opening price, closing price
 market_research: user is asking for investment ideas, comparisons,
 market trends, or research-oriented information.
 help_faq: user is asking how to do something in the app or where to find information.
@@ -67,7 +76,8 @@ Return **JSON ONLY** like this:
 "price": number | null,
 "action": "buy" | "sell" | null,
 "order_type": "market" | "limit" | null,
-"account": "cash" | "tfsa" | "rrsp" | null
+"account": "cash" | "tfsa" | "rrsp" | null,
+"order_id": string | null
 }
 
 Rules:
@@ -105,7 +115,7 @@ Rules:
             llm_output["action"] = llm_output.pop("side")
 
         # ensure all required fields exist
-        for field in ["action", "symbol", "quantity", "price", "account"]:
+        for field in ["action", "symbol", "quantity", "price", "order_type", "account", "order_id"]:
             llm_output.setdefault(field, None)
 
         return llm_output

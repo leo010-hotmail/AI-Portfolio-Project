@@ -4,6 +4,9 @@ class MockLLM(LLMClient):
     def classify_intent(self, user_input: str) -> dict:
         text = user_input.lower()
 
+        if "cancel" in text:
+            return {"intent": "cancel_order", "confidence": 0.6}
+
         if "buy" in text or "sell" in text:
             return {"intent": "place_trade", "confidence": 0.6}
         if "transfer" in text:
@@ -28,13 +31,31 @@ class MockLLM(LLMClient):
     def parse(self, user_input: str) -> dict:
         text = user_input.lower()
 
-        if "buy" in text:
-            return {
-                "intent": "place_trade",
-                "symbol": "AAPL" if "apple" in text else None,
-                "quantity": None,
-                "price": None,
-                "account": None
-            }
+        parsed = {
+            "symbol": None,
+            "quantity": None,
+            "price": None,
+            "action": None,
+            "order_type": None,
+            "account": None,
+            "order_id": None
+        }
 
-        return {"intent": "unknown"}
+        if "buy" in text:
+            parsed.update({
+                "symbol": "AAPL" if "apple" in text else "AAPL",
+                "quantity": 10,
+                "action": "buy"
+            })
+
+        if "sell" in text:
+            parsed.update({
+                "symbol": "TSLA" if "tesla" in text else "TSLA",
+                "quantity": 5,
+                "action": "sell"
+            })
+
+        if "cancel" in text:
+            parsed["order_id"] = "test-order-123"
+
+        return parsed

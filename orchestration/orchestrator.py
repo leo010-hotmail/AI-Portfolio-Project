@@ -39,6 +39,12 @@ def handle_user_input(user_input: str):
 
     # Step 3: start new trade flow
     if intent == "place_trade":
+        st.session_state.trade_state = {"flow": "place_trade"}
+        parsed = llm.parse(user_input)
+        return handle_trade_flow(parsed, user_input)
+
+    if intent == "cancel_order":
+        st.session_state.trade_state = {"flow": "cancel_order"}
         parsed = llm.parse(user_input)
         return handle_trade_flow(parsed, user_input)
 
@@ -77,7 +83,8 @@ def handle_user_input(user_input: str):
         "I’m not sure I can help with that yet.\n\n"
         "You can try something like:\n"
         "- *Buy 10 shares of AAPL*\n"
-        "- *Sell 5 TSLA at market price*"
+        "- *Sell 5 TSLA at market price*\n"
+        "- *Cancel order 12345 for AAPL*"
     )
 
 

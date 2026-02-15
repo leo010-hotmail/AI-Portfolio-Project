@@ -1,4 +1,5 @@
-from services.broker_app import list_accounts, place_order
+from services.broker_app import list_accounts, place_order, cancel_order
+
 
 class TradeService:
     def place_trade(self, trade):
@@ -9,7 +10,6 @@ class TradeService:
         order_type = trade.get("order_type", "market")
         price = trade.get("price")
 
-        # Get first account (sandbox)
         accounts = list_accounts()
         account_id = accounts[0]["id"]
 
@@ -24,7 +24,7 @@ class TradeService:
             )
 
             return (
-                f"✅ Order submitted!\n\n"
+                f"Order submitted!\n\n"
                 f"Symbol: {order['symbol']}\n"
                 f"Side: {order['side']}\n"
                 f"Quantity: {order['qty']}\n"
@@ -33,4 +33,20 @@ class TradeService:
             )
 
         except Exception as e:
-            return f"❌ Trade failed: {str(e)}"
+            return f"Trade failed: {str(e)}"
+
+    def cancel_trade(self, order_id):
+        accounts = list_accounts()
+        account_id = accounts[0]["id"]
+
+        try:
+            order = cancel_order(account_id=account_id, order_id=order_id)
+            return (
+                f"Cancel request submitted!\n\n"
+                f"Order ID: {order.get('id', order_id)}\n"
+                f"Symbol: {order.get('symbol', 'N/A')}\n"
+                f"Status: {order.get('status', 'cancelled')}"
+            )
+
+        except Exception as e:
+            return f"Cancel failed: {str(e)}"
