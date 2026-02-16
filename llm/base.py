@@ -12,3 +12,7 @@ class LLMClient(ABC):
         Returns structured trade parameters.
         """
         pass
+
+    @abstractmethod
+    def summarize_articles(self, articles: list[dict], query_hint: str | None = None) -> str:
+        pass

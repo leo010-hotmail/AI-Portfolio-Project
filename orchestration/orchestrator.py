@@ -1,5 +1,6 @@
 from llm import get_llm_client
 from orchestration.market_data_flow import handle_market_data_flow
+from orchestration.market_research_flow import handle_market_research_flow
 from orchestration.orders_flow import handle_view_orders_flow
 from orchestration.portfolio_flow import handle_view_portfolio_flow
 from orchestration.trade_flow import handle_trade_flow
@@ -33,6 +34,9 @@ def handle_user_input(user_input: str):
         parsed = llm.parse(user_input)
         return handle_market_data_flow(parsed, user_input)
 
+    if trade_state and trade_state.get("flow") == "market_research":
+        return handle_market_research_flow(user_input)
+
     if trade_state and (
         len(trade_state) > 0 or "expected_field" in trade_state
     ):
@@ -61,6 +65,10 @@ def handle_user_input(user_input: str):
         parsed = llm.parse(user_input)
         return handle_market_data_flow(parsed, user_input)
 
+    if intent == "market_research":
+        st.session_state.trade_state = {"flow": "market_research"}
+        return handle_market_research_flow(user_input)
+
     if intent == "view_orders":
         return handle_view_orders_flow()
 
@@ -70,25 +78,40 @@ def handle_user_input(user_input: str):
     if intent == "transfer":
         return (
             "💸 Transfers aren’t supported yet, but they’re on the roadmap.\n\n"
-            "I can currently help you **buy or sell stocks** if that’s useful."
+            "I can currently help you **buy or sell stocks** if that’s useful.\n"
+            "You can try something like:\n"
+            "- *Buy 10 shares of AAPL*\n"
+            "- *Sell 5 TSLA at market price*\n"
+            "- *Cancel order for AAPL*\n"
+            "- *Show me my open orders*\n"
+            "- *How is my portfolio doing?*\n"
+            "- *Show me the current price for MSFT*"
         )
 
-    if intent == "market_research":
-        return (
-            "📝 Market research is not available yet.\n\n"
-            "Right now, I’m focused on helping you **place trades quickly and accurately**."
-        )
-    
     if intent == "kyc":
         return (
             "📝 Profile and KYC updates aren’t available yet.\n\n"
-            "Right now, I’m focused on helping you **place trades quickly and accurately**."
+            "Right now, I’m focused on helping you **place trades quickly and accurately**.\n"
+            "You can try something like:\n"
+            "- *Buy 10 shares of AAPL*\n"
+            "- *Sell 5 TSLA at market price*\n"
+            "- *Cancel order for AAPL*\n"
+            "- *Show me my open orders*\n"
+            "- *How is my portfolio doing?*\n"
+            "- *Show me the current price for MSFT*"
         )
     
     if intent == "help_faq":
         return (
             "📝 I can't help with common questions about using the platform at this stage.\n\n"
-            "Right now, I’m focused on helping you **place trades quickly and accurately**."
+            "Right now, I’m focused on helping you **place trades quickly and accurately**.\n"
+            "You can try something like:\n"
+            "- *Buy 10 shares of AAPL*\n"
+            "- *Sell 5 TSLA at market price*\n"
+            "- *Cancel order for AAPL*\n"
+            "- *Show me my open orders*\n"
+            "- *How is my portfolio doing?*\n"
+            "- *Show me the current price for MSFT*"
         )
     # fallback
     return (

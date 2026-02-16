@@ -193,7 +193,7 @@ with st.sidebar:
         """
         <div style="text-align:center; font-size:12px; color:gray;">
         Built by <b>Aman A.</b><br>
-        Powered by <b>OpenAI</b> and <b>Alpaca</b>.<br>
+        Powered by <b>OpenAI</b>, <b>Alpaca</b> and <b>NewAPI</b>.<br>
         Interactions may be logged for product improvement.
         </div>
         """,

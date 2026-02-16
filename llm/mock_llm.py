@@ -73,3 +73,15 @@ class MockLLM(LLMClient):
                 break
 
         return parsed
+
+    def summarize_articles(self, articles: list[dict], query_hint: str | None = None) -> str:
+        if not articles:
+            return "No articles were provided to summarize."
+
+        query_bit = f" about {query_hint}" if query_hint else ""
+        summary_lines = [f"Summary{query_bit}:"]
+        for idx, article in enumerate(articles[:3], start=1):
+            title = article.get("title") or article.get("headline") or f"Article {idx}"
+            summary_lines.append(f"- {title}")
+
+        return "\n".join(summary_lines)
