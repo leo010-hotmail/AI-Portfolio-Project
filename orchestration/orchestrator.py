@@ -1,5 +1,6 @@
 from llm import get_llm_client
 from orchestration.market_data_flow import handle_market_data_flow
+from orchestration.orders_flow import handle_view_orders_flow
 from orchestration.trade_flow import handle_trade_flow
 import streamlit as st
 
@@ -58,6 +59,9 @@ def handle_user_input(user_input: str):
         st.session_state.trade_state = {"flow": "market_data"}
         parsed = llm.parse(user_input)
         return handle_market_data_flow(parsed, user_input)
+
+    if intent == "view_orders":
+        return handle_view_orders_flow()
 
     if intent == "portfolio_insight":
         return (
