@@ -66,6 +66,7 @@ def handle_market_data_flow(parsed_params, user_input):
 
         st.session_state.last_chart = df.sort_index()
         st.session_state.last_chart_symbol = symbol
+        st.session_state.show_market_data_chart = True
     except Exception as exc:
         trade_state.pop("symbol", None)
         trade_state.pop("expected_field", None)

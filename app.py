@@ -2,29 +2,28 @@ import streamlit as st
 from orchestration.orchestrator import handle_user_input
 from services.broker_app import get_trading_account_details, list_accounts, get_account, list_orders, list_positions
 from services.logger import log_message
-from services.market_data import bars_to_dataframe, fetch_30_day_history
 import plotly.graph_objects as go
 
 import time
 
 MAX_REQUESTS = 20
 WINDOW_SECONDS = 60
-def render_price_chart(symbol: str):
-    bars = fetch_30_day_history(symbol)
-
-    if not bars:
-        st.warning("No historical data found.")
+def render_price_chart(symbol: str, df):
+    if df is None or df.empty:
+        st.warning("No historical data available to render the chart.")
         return
 
-    df = bars_to_dataframe(bars)
+    if "c" not in df:
+        st.warning("Historical data is missing closing prices.")
+        return
 
+    df = df.sort_index()
     min_price = df["c"].min()
     max_price = df["c"].max()
 
-    padding = (max_price - min_price) * 0.05  # 5% padding
+    padding = (max_price - min_price) * 0.05 if min_price is not None and max_price is not None else 0.0
 
     fig = go.Figure()
-
     fig.add_trace(go.Scatter(
         x=df.index,
         y=df["c"],
@@ -88,6 +87,9 @@ if "messages" not in st.session_state:
 
 if "trade_state" not in st.session_state:
     st.session_state.trade_state = {}
+
+if "show_market_data_chart" not in st.session_state:
+    st.session_state.show_market_data_chart = False
 
 
 # ---------- Account Snapshot (load once per session) ----------
@@ -192,34 +194,17 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# --------- Render History Chart ------------
-if "last_chart" in st.session_state:
-    df = st.session_state.last_chart
-    symbol = st.session_state.last_chart_symbol
-
-    min_price = df["c"].min()
-    max_price = df["c"].max()
-    padding = (max_price - min_price) * 0.05
-
-    fig = go.Figure()
-
-    fig.add_trace(go.Scatter(
-        x=df.index,
-        y=df["c"],
-        mode="lines",
-        name="Close Price"
-    ))
-
-    fig.update_layout(
-        title=f"{symbol} - Last 30 Days",
-        yaxis=dict(
-            range=[min_price - padding, max_price + padding]
-        ),
-        xaxis_title="Date",
-        yaxis_title="Price",
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
+    # --------- Render History Chart ------------
+    if (
+        msg["role"] == "assistant"
+        and st.session_state.get("show_market_data_chart")
+        and "last_chart" in st.session_state
+        and msg["content"].startswith("### Market Update")
+    ):
+        render_price_chart(
+            st.session_state.last_chart_symbol,
+            st.session_state.last_chart
+        )
 
 # ---------- Chat Input ----------
 user_input = st.chat_input("What would you like to do today?")
@@ -227,6 +212,7 @@ user_input = st.chat_input("What would you like to do today?")
 
 
 if user_input:
+    #st.session_state.show_market_data_chart = False
     # 1️⃣ Save user message
     st.session_state.messages.append({
         "role": "user",
