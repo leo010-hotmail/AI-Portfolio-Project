@@ -2,31 +2,29 @@ import streamlit as st
 from orchestration.orchestrator import handle_user_input
 from services.broker_app import get_trading_account_details, list_accounts, get_account, list_orders, list_positions
 from services.logger import log_message
+from services.market_data import bars_to_dataframe, fetch_30_day_history
 import plotly.graph_objects as go
 
 import time
 
 MAX_REQUESTS = 20
 WINDOW_SECONDS = 60
-def render_price_chart(symbol: str, df):
-    if df is None or df.empty:
-        st.warning("No historical data available to render the chart.")
+def render_price_chart(symbol: str):
+    bars = fetch_30_day_history(symbol)
+
+    if not bars:
+        st.warning("No historical data found.")
         return
 
-    if "c" not in df:
-        st.warning("Historical data is missing closing prices.")
-        return
+    df = bars_to_dataframe(bars)
 
-    df = df.sort_index()
     min_price = df["c"].min()
     max_price = df["c"].max()
 
-    if min_price is None or max_price is None:
-        padding = 0.0
-    else:
-        padding = (max_price - min_price) * 0.05
+    padding = (max_price - min_price) * 0.05  # 5% padding
 
     fig = go.Figure()
+
     fig.add_trace(go.Scatter(
         x=df.index,
         y=df["c"],
@@ -194,12 +192,34 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-chart_df = st.session_state.get("last_chart")
-chart_symbol = st.session_state.get("last_chart_symbol")
+# --------- Render History Chart ------------
+if "last_chart" in st.session_state:
+    df = st.session_state.last_chart
+    symbol = st.session_state.last_chart_symbol
 
-if chart_df is not None and chart_symbol:
-    st.subheader(f"{chart_symbol} - Last 30 Days")
-    render_price_chart(chart_symbol, chart_df)
+    min_price = df["c"].min()
+    max_price = df["c"].max()
+    padding = (max_price - min_price) * 0.05
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=df.index,
+        y=df["c"],
+        mode="lines",
+        name="Close Price"
+    ))
+
+    fig.update_layout(
+        title=f"{symbol} - Last 30 Days",
+        yaxis=dict(
+            range=[min_price - padding, max_price + padding]
+        ),
+        xaxis_title="Date",
+        yaxis_title="Price",
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
 
 # ---------- Chat Input ----------
 user_input = st.chat_input("What would you like to do today?")
