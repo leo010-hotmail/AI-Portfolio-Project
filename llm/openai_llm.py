@@ -169,3 +169,34 @@ Respond with a short paragraph and up to five bullet points highlighting the mai
         )
 
         return response.choices[0].message.content.strip()
+
+    def extract_company_details(self, user_input: str) -> dict:
+        system_prompt = """
+You are a metadata extractor for a trading research assistant.
+Return JSON ONLY:
+{
+  "company_name": "Full company name or null",
+  "company_symbol": "Ticker symbol in uppercase or null"
+}
+If the user mentions a company name or ticker anywhere in the text, capture it exactly as provided (symbol in uppercase). Otherwise return null values.
+"""
+
+        response = self.client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_input}
+            ],
+            temperature=0
+        )
+
+        content = response.choices[0].message.content
+        try:
+            result = json.loads(content)
+        except json.JSONDecodeError:
+            return {"company_name": None, "company_symbol": None}
+
+        return {
+            "company_name": result.get("company_name"),
+            "company_symbol": result.get("company_symbol")
+        }

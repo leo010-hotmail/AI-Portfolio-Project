@@ -16,3 +16,7 @@ class LLMClient(ABC):
     @abstractmethod
     def summarize_articles(self, articles: list[dict], query_hint: str | None = None) -> str:
         pass
+
+    @abstractmethod
+    def extract_company_details(self, user_input: str) -> dict:
+        pass

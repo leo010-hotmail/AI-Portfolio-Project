@@ -1,3 +1,5 @@
+import re
+
 from llm.base import LLMClient
 
 class MockLLM(LLMClient):
@@ -85,3 +87,17 @@ class MockLLM(LLMClient):
             summary_lines.append(f"- {title}")
 
         return "\n".join(summary_lines)
+
+    def extract_company_details(self, user_input: str) -> dict:
+        text = user_input or ""
+        symbol_match = re.search(r"\$?([A-Za-z]{1,5})", text)
+        company_symbol = symbol_match.group(1).upper() if symbol_match else None
+
+        name_match = re.search(r"(?:about|for|on)\s+([A-Za-z][A-Za-z& ]+)", text, re.IGNORECASE)
+        company_name = None
+        if name_match:
+            company_name = name_match.group(1).strip()
+        return {
+            "company_name": company_name,
+            "company_symbol": company_symbol
+        }
