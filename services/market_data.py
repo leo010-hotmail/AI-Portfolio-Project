@@ -60,7 +60,6 @@ def fetch_market_data(symbol: str) -> dict:
         "previous_close": previous_close,
         "volume": daily_bar.get("v"),
         "change_pct": change_pct,
-        "exchange": latest_quote.get("x"),
         "bid": latest_quote.get("bp"),
         "ask": latest_quote.get("ap"),
     }
