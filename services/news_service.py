@@ -86,6 +86,6 @@ def fetch_news_articles(
     articles = payload.get("articles") or payload.get("data") or []
 
     if not isinstance(articles, list):
-        raise NewsAPIError("Unexpected news payload from Benzinga API.")
+        raise NewsAPIError("Unexpected news payload from Perigon API.")
 
     return articles[:limit]
