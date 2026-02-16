@@ -85,7 +85,8 @@ def handle_user_input(user_input: str):
             "- *Cancel order for AAPL*\n"
             "- *Show me my open orders*\n"
             "- *How is my portfolio doing?*\n"
-            "- *Show me the current price for MSFT*"
+            "- *Show me the current price for MSFT*\n"
+            "- *What is the latest news on Tesla*"
         )
 
     if intent == "kyc":
@@ -98,7 +99,8 @@ def handle_user_input(user_input: str):
             "- *Cancel order for AAPL*\n"
             "- *Show me my open orders*\n"
             "- *How is my portfolio doing?*\n"
-            "- *Show me the current price for MSFT*"
+            "- *Show me the current price for MSFT*\n"
+            "- *What is the latest news on Tesla*"
         )
     
     if intent == "help_faq":
@@ -111,7 +113,8 @@ def handle_user_input(user_input: str):
             "- *Cancel order for AAPL*\n"
             "- *Show me my open orders*\n"
             "- *How is my portfolio doing?*\n"
-            "- *Show me the current price for MSFT*"
+            "- *Show me the current price for MSFT*\n"
+            "- *What is the latest news on Tesla*"
         )
     # fallback
     return (
@@ -122,7 +125,8 @@ def handle_user_input(user_input: str):
         "- *Cancel order for AAPL*\n"
         "- *Show me my open orders*\n"
         "- *How is my portfolio doing?*\n"
-        "- *Show me the current price for MSFT*"
+        "- *Show me the current price for MSFT*\n"
+        "- *What is the latest news on Tesla*"
     )
 
 

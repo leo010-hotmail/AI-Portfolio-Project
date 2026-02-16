@@ -1,10 +1,12 @@
 import os
 import requests
+from datetime import datetime, timedelta
+import pandas as pd
 
 ALPACA_DATA_URL = "https://data.sandbox.alpaca.markets/v2/stocks/{symbol}/snapshot?feed=delayed_sip"
 ALPACA_API_KEY = os.environ.get("ALPACA_API_KEY")
 ALPACA_SECRET_KEY = os.environ.get("ALPACA_SECRET_KEY")
-
+BASE_URL = "https://data.sandbox.alpaca.markets/v2/stocks/bars"
 
 class AlpacaMarketDataError(Exception):
     pass
@@ -62,3 +64,36 @@ def fetch_market_data(symbol: str) -> dict:
         "bid": latest_quote.get("bp"),
         "ask": latest_quote.get("ap"),
     }
+
+def fetch_30_day_history(symbol: str):
+    end = datetime.now().date()
+    start = end - timedelta(days=30)
+
+    params = {
+        "symbols": symbol,
+        "timeframe": "1Day",
+        "start": start.isoformat(),
+        "end": end.isoformat(),
+        "limit": 1000,
+        "adjustment": "raw",
+        "feed": "iex",
+        "sort" : "asc"
+    }
+
+    headers = {
+        "APCA-API-KEY-ID": ALPACA_API_KEY,
+        "APCA-API-SECRET-KEY": ALPACA_SECRET_KEY,
+    }
+
+    response = requests.get(BASE_URL, headers=headers, params=params)
+    response.raise_for_status()
+
+    data = response.json()
+    return data.get("bars", {}).get(symbol, [])
+
+def bars_to_dataframe(bars):
+    df = pd.DataFrame(bars)
+    df["t"] = pd.to_datetime(df["t"])
+    df.set_index("t", inplace=True)
+    return df
+

@@ -5,7 +5,6 @@ import streamlit as st
 from llm import get_llm_client
 from services.news_service import NewsAPIError, fetch_news_articles
 
-
 llm = get_llm_client()
 
 

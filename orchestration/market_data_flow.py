@@ -1,5 +1,6 @@
 import streamlit as st
-from services.market_data import fetch_market_data
+from services.market_data import fetch_market_data, fetch_30_day_history, bars_to_dataframe
+
 
 FIELD_PROMPT = "Which stock symbol would you like market data for?"
 
@@ -61,6 +62,11 @@ def handle_market_data_flow(parsed_params, user_input):
 
     try:
         data = fetch_market_data(symbol)
+        bars = fetch_30_day_history(symbol)
+        df = bars_to_dataframe(bars)
+
+        st.session_state.last_chart = df.sort_index()
+        st.session_state.last_chart_symbol = symbol
     except Exception as exc:
         trade_state.pop("symbol", None)
         trade_state.pop("expected_field", None)
