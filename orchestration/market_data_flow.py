@@ -1,3 +1,4 @@
+import time
 import streamlit as st
 from services.market_data import fetch_market_data, fetch_30_day_history, bars_to_dataframe
 
@@ -64,9 +65,16 @@ def handle_market_data_flow(parsed_params, user_input):
         bars = fetch_30_day_history(symbol)
         df = bars_to_dataframe(bars)
 
-        st.session_state.last_chart = df.sort_index()
+        sorted_df = df.sort_index()
+        chart_info = {
+            "symbol": symbol,
+            "df": sorted_df,
+            "key": f"market_chart_{symbol}_{int(time.time())}",
+        }
+        st.session_state.last_chart = sorted_df
         st.session_state.last_chart_symbol = symbol
-        st.session_state.show_market_data_chart = True
+        st.session_state.last_chart_key = chart_info["key"]
+        st.session_state.pending_market_data_chart = chart_info
     except Exception as exc:
         trade_state.pop("symbol", None)
         trade_state.pop("expected_field", None)

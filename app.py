@@ -8,7 +8,7 @@ import time
 
 MAX_REQUESTS = 20
 WINDOW_SECONDS = 60
-def render_price_chart(symbol: str, df):
+def render_price_chart(symbol: str, df, key=None):
     if df is None or df.empty:
         st.warning("No historical data available to render the chart.")
         return
@@ -43,7 +43,7 @@ def render_price_chart(symbol: str, df):
         yaxis_title="Price",
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True, key=key)
 
 def load_sidebar_data():
     try:
@@ -88,8 +88,8 @@ if "messages" not in st.session_state:
 if "trade_state" not in st.session_state:
     st.session_state.trade_state = {}
 
-if "show_market_data_chart" not in st.session_state:
-    st.session_state.show_market_data_chart = False
+if "chart_history" not in st.session_state:
+    st.session_state.chart_history = {}
 
 
 # ---------- Account Snapshot (load once per session) ----------
@@ -190,21 +190,19 @@ def render_top_holdings():
         )
 render_top_holdings()
 # ---------- Render Chat History ----------
-for msg in st.session_state.messages:
+for idx, msg in enumerate(st.session_state.messages):
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-    # --------- Render History Chart ------------
-    if (
-        msg["role"] == "assistant"
-        and st.session_state.get("show_market_data_chart")
-        and "last_chart" in st.session_state
-        and msg["content"].startswith("### Market Update")
-    ):
-        render_price_chart(
-            st.session_state.last_chart_symbol,
-            st.session_state.last_chart
-        )
+    if msg["role"] == "assistant":
+        chart_info = st.session_state.chart_history.get(idx)
+        if chart_info:
+            st.subheader(f"{chart_info['symbol']} - Last 30 Days")
+            render_price_chart(
+                chart_info["symbol"],
+                chart_info["df"],
+                key=chart_info.get("key"),
+            )
 
 # ---------- Chat Input ----------
 user_input = st.chat_input("What would you like to do today?")
@@ -212,7 +210,6 @@ user_input = st.chat_input("What would you like to do today?")
 
 
 if user_input:
-    #st.session_state.show_market_data_chart = False
     # 1️⃣ Save user message
     st.session_state.messages.append({
         "role": "user",
@@ -231,6 +228,11 @@ if user_input:
             "role": "assistant",
             "content": response
         })
+
+        pending_chart = st.session_state.pop("pending_market_data_chart", None)
+        if pending_chart:
+            idx = len(st.session_state.messages) - 1
+            st.session_state.chart_history[idx] = pending_chart
 
     # ✅ Log assistant response immediately
     log_message("assistant", response, session_id=st.session_state.get("session_id", "session1"))
