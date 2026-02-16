@@ -32,7 +32,6 @@ def summarize_market_data(data):
         f"- **Previous Close:** {format_price(data.get('previous_close'))}",
         f"- **Volume:** {format_volume(data.get('volume'))}",
         f"- **Change:** {format_percentage(data.get('change_pct'))}",
-        f"- **Exchange:** {data.get('exchange', 'N/A')}",
         f"- **Bid:** {format_price(data.get('bid'))}",
         f"- **Ask:** {format_price(data.get('ask'))}",
     ]
