@@ -17,7 +17,6 @@ class OpenAILLM:
 You are an intent classifier for a trading platform assistant.
 
 Possible intents:
-- portfolio_insight
 - place_trade
 - cancel_order
 - view_orders

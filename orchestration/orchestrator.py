@@ -1,6 +1,7 @@
 from llm import get_llm_client
 from orchestration.market_data_flow import handle_market_data_flow
 from orchestration.orders_flow import handle_view_orders_flow
+from orchestration.portfolio_flow import handle_view_portfolio_flow
 from orchestration.trade_flow import handle_trade_flow
 import streamlit as st
 
@@ -63,12 +64,8 @@ def handle_user_input(user_input: str):
     if intent == "view_orders":
         return handle_view_orders_flow()
 
-    if intent == "portfolio_insight":
-        return (
-            "📊 I’m still building the portfolio insights module.\n\n"
-            "Soon you’ll be able to see holdings, performance, and analytics here.\n\n"
-            "For now, I can help you **place a trade** if you’d like."
-        )
+    if intent == "view_portfolio":
+        return handle_view_portfolio_flow()
 
     if intent == "transfer":
         return (
@@ -99,7 +96,9 @@ def handle_user_input(user_input: str):
         "You can try something like:\n"
         "- *Buy 10 shares of AAPL*\n"
         "- *Sell 5 TSLA at market price*\n"
-        "- *Cancel order 12345 for AAPL*\n"
+        "- *Cancel order for AAPL*\n"
+        "- *Show me my open orders*\n"
+        "- *How is my portfolio doing?*\n"
         "- *Show me the current price for MSFT*"
     )
 
