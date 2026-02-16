@@ -4,6 +4,10 @@ class MockLLM(LLMClient):
     def classify_intent(self, user_input: str) -> dict:
         text = user_input.lower()
 
+        market_data_keywords = ("market data", "price of", "current price", "show me the price", "quote", "what's the price", "how is")
+        if any(keyword in text for keyword in market_data_keywords) and "buy" not in text and "sell" not in text:
+            return {"intent": "market_data", "confidence": 0.7}
+
         if "cancel" in text:
             return {"intent": "cancel_order", "confidence": 0.6}
 
@@ -57,5 +61,15 @@ class MockLLM(LLMClient):
 
         if "cancel" in text:
             parsed["order_id"] = "test-order-123"
+
+        clean_words = [
+            token.strip(".,? ").upper()
+            for token in text.split()
+            if token.strip(".,? ")
+        ]
+        for token in clean_words:
+            if token.isalpha() and 1 < len(token) <= 5:
+                parsed["symbol"] = token
+                break
 
         return parsed

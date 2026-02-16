@@ -6,6 +6,7 @@ trade_service = TradeService()
 
 PLACE_TRADE_FIELDS = ["action", "symbol", "quantity", "order_type", "account"]
 CANCEL_TRADE_FIELDS = ["cancel_symbol"]
+MARKET_DATA_FIELDS = ["mdata_symbol"]
 FLOW_REQUIRED_FIELDS = {
     "place_trade": PLACE_TRADE_FIELDS,
     "cancel_order": CANCEL_TRADE_FIELDS
@@ -14,7 +15,8 @@ FLOW_REQUIRED_FIELDS = {
 FIELD_PROMPTS = {
     "action": "Do you want to buy or sell?",
     "symbol": "Which stock would you like to trade?",
-    "cancel_symbol": "Which stock trade would you like to cancel?",
+    "cancel_symbol": "Which order would you like to cancel, indicate the symbol?",
+    "mdata_symbol" : "For which stock do you want more information",
     "quantity": "How many shares would you like to trade?",
     "order_type": "Is this a market order or a limit order?",
     "price": "What limit price would you like to use?",
@@ -179,7 +181,7 @@ def summarize_trade(trade):
         price = trade["price"]
         total_cost = quantity * price
         lines.append(f"- **Price:** ${price}")
-        lines.append(f"- **Estimated Cost:** ${total_cost}")
+        lines.append(f"- **Estimated Amount:** ${total_cost}")
 
     return (
         "### Trade Summary\n"

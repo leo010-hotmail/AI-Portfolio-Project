@@ -28,6 +28,7 @@ st.session_state.request_times.append(now)
 
 
 st.title("AI Investment Assistant - v1.0a")
+st.markdown("###### Trade, view orders, analyse portfolio, check stock quotes, monitor market news")
 
 # ---------- Session State ----------
 if "messages" not in st.session_state:

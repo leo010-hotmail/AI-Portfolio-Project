@@ -1,4 +1,5 @@
 from llm import get_llm_client
+from orchestration.market_data_flow import handle_market_data_flow
 from orchestration.trade_flow import handle_trade_flow
 import streamlit as st
 
@@ -24,10 +25,15 @@ def handle_user_input(user_input: str):
     # 🔑 Step 1: if a trade is in progress, continue it
     trade_state = st.session_state.get("trade_state", {})
 
+    if trade_state and trade_state.get("flow") == "market_data":
+        if len(user_input) > MAX_CHARS:
+            return "Please keep your message under 500 characters."
+        parsed = llm.parse(user_input)
+        return handle_market_data_flow(parsed, user_input)
+
     if trade_state and (
         len(trade_state) > 0 or "expected_field" in trade_state
     ):
-    
         if len(user_input) > MAX_CHARS:
             return "Please keep your message under 500 characters."
         parsed = llm.parse(user_input)
@@ -47,6 +53,11 @@ def handle_user_input(user_input: str):
         st.session_state.trade_state = {"flow": "cancel_order"}
         parsed = llm.parse(user_input)
         return handle_trade_flow(parsed, user_input)
+
+    if intent == "market_data":
+        st.session_state.trade_state = {"flow": "market_data"}
+        parsed = llm.parse(user_input)
+        return handle_market_data_flow(parsed, user_input)
 
     if intent == "portfolio_insight":
         return (
@@ -84,7 +95,8 @@ def handle_user_input(user_input: str):
         "You can try something like:\n"
         "- *Buy 10 shares of AAPL*\n"
         "- *Sell 5 TSLA at market price*\n"
-        "- *Cancel order 12345 for AAPL*"
+        "- *Cancel order 12345 for AAPL*\n"
+        "- *Show me the current price for MSFT*"
     )
 
 
