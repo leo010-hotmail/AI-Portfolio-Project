@@ -9,6 +9,21 @@ import time
 MAX_REQUESTS = 20
 WINDOW_SECONDS = 60
 
+def load_sidebar_data():
+    try:
+        accounts = list_accounts()
+        account_id = accounts[0]["id"]
+
+        st.session_state.account_snapshot = get_account(account_id)
+        st.session_state.trading_account = get_trading_account_details(account_id)
+        st.session_state.recent_orders = list_orders(account_id, limit=5)
+        st.session_state.positions = list_positions(account_id)
+
+    except Exception:
+        st.session_state.account_snapshot = None
+        st.session_state.recent_orders = []
+        st.session_state.positions = []
+
 if "request_times" not in st.session_state:
     st.session_state.request_times = []
 
@@ -39,19 +54,25 @@ if "trade_state" not in st.session_state:
 
 
 # ---------- Account Snapshot (load once per session) ----------
-if "account_snapshot" not in st.session_state:
-    try:
-        accounts = list_accounts()
-        account_id = accounts[0]["id"]
+if "sidebar_loaded" not in st.session_state:
+    load_sidebar_data()
+    st.session_state.sidebar_loaded = True
+#    try:
+#        accounts = list_accounts()
+#        account_id = accounts[0]["id"]
     
-        st.session_state.account_snapshot = get_account(account_id)
-        st.session_state.trading_account = get_trading_account_details(account_id)
+#        st.session_state.account_snapshot = get_account(account_id)
+#        st.session_state.trading_account = get_trading_account_details(account_id)
 
-    except Exception as e:
-        st.session_state.account_snapshot = None
-        st.sidebar.error("Failed to load account snapshot")
+#    except Exception as e:
+#        st.session_state.account_snapshot = None
+#        st.sidebar.error("Failed to load account snapshot")
 
 with st.sidebar:
+    if st.button("🔄 Refresh"):
+        load_sidebar_data()
+        st.rerun()
+
     st.header("📊 Account Snapshot")
 
     snapshot = st.session_state.get("account_snapshot")
@@ -79,11 +100,12 @@ with st.sidebar:
 
 # ---------- Recent Order  ----------
 # Get account ID
-accounts = list_accounts()
-account_id = accounts[0]["id"]
+#accounts = list_accounts()
+#account_id = accounts[0]["id"]
 
 # Fetch 5 most recent orders
-orders = list_orders(account_id, limit=5)
+#orders = list_orders(account_id, limit=5)
+orders = st.session_state.get("recent_orders", [])
 
 st.sidebar.markdown("### 🧾 Recent Orders")
 
@@ -101,17 +123,13 @@ else:
 
 # ---------- Top holdings  ----------
 def render_top_holdings():
-    accounts = list_accounts()
-    account_id = accounts[0]["id"]
-
-    positions = list_positions(account_id)
+    positions = st.session_state.get("positions", [])
 
     if not positions:
         st.sidebar.markdown("### 📊 Top Holdings")
         st.sidebar.write("No positions yet.")
         return
 
-    # Sort by market value (descending)
     sorted_positions = sorted(
         positions,
         key=lambda x: float(x.get("market_value", 0)),
