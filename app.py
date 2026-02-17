@@ -13,34 +13,43 @@ def render_price_chart(symbol: str, df, key=None):
         st.warning("No historical data available to render the chart.")
         return
 
-    if "c" not in df:
-        st.warning("Historical data is missing closing prices.")
+    if not all(col in df for col in ("o", "h", "l", "c")):
+        st.warning("Historical data is missing required OHLC fields.")
         return
 
     df = df.sort_index()
-    min_price = df["c"].min()
-    max_price = df["c"].max()
+    low = df["l"].min()
+    high = df["h"].max()
 
-    padding = (max_price - min_price) * 0.05 if min_price is not None and max_price is not None else 0.0
+    padding = (high - low) * 0.05 if high is not None and low is not None else 0.0
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=df.index,
-        y=df["c"],
-        mode="lines",
-        name="Close Price"
-    ))
-
+    fig = go.Figure(
+        data=[
+            go.Candlestick(
+                x=df.index,
+                open=df["o"],
+                high=df["h"],
+                low=df["l"],
+                close=df["c"],
+                increasing_line_color="green",
+                decreasing_line_color="red",
+                increasing_fillcolor="rgba(0, 128, 0, 0.5)",
+                decreasing_fillcolor="rgba(255, 0, 0, 0.5)",
+                name="Price",
+            )
+        ]
+    )
     fig.update_layout(
         title=f"{symbol} - Last 30 Days",
         yaxis=dict(
             range=[
-                min_price - padding,
-                max_price + padding
+                low - padding,
+                high + padding,
             ]
         ),
         xaxis_title="Date",
         yaxis_title="Price",
+        xaxis_rangeslider_visible=False
     )
 
     st.plotly_chart(fig, use_container_width=True, key=key)
