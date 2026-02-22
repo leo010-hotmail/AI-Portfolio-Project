@@ -33,8 +33,11 @@ class TradeService:
             )
 
         except Exception as e:
-            return f"Trade failed: Please ensure you have sufficient funds. \nAt this time we only support trading in U.S.-listed securities\n  {str(e)}"
-
+            return (
+                f"Trade failed: Please ensure you have sufficient funds.\n"
+                f"At this time we only support trading in U.S.-listed securities.\n"
+                f"{str(e)}"
+            )
     def cancel_trade(self, order_id):
         accounts = list_accounts()
         account_id = accounts[0]["id"]
